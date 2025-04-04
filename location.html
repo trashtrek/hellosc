@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Service Center Locator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+    select, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .details {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .service-btn {
+      background-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Find Nearest Service Center</h2>
+
+  <label for="stateSelect">State:</label>
+  <select id="stateSelect" onchange="loadDistricts()">
+    <option value="">Select State</option>
+  </select>
+
+  <label for="districtSelect">District:</label>
+  <select id="districtSelect" onchange="loadCenters()">
+    <option value="">Select District</option>
+  </select>
+
+  <label for="centerSelect">Nearby Center:</label>
+  <select id="centerSelect" onchange="showDetails()">
+    <option value="">Select Center</option>
+  </select>
+
+  <div class="details" id="details" style="display:none;">
+    <h3>Nearest Service Center Info:</h3>
+    <p><strong>Service Center:</strong> <span id="serviceCenter"></span></p>
+    <p><strong>Local Workshop:</strong> <span id="workshop"></span></p>
+    <p><strong>Contact Number:</strong> <span id="contactNumber"></span></p>
+
+    <div class="button-group">
+      <a id="callButton" href="">
+        <button>Call for Service</button>
+      </a>
+      <a id="serviceButton" href="">
+        <button class="service-btn">Service</button>
+      </a>
+    </div>
+  </div>
+
+  <!-- Embedded Dataset -->
+  <script>
+    const data = [
+      {
+        state: "Karnataka",
+        district: "Bangalore",
+        center: "Center A",
+        service_center: "ABC Services",
+        workshop: "Bangalore Auto Workshop",
+        contact: "+919000000001"
+      },
+      {
+        state: "Karnataka",
+        district: "Mysore",
+        center: "Center B",
+        service_center: "XYZ Services",
+        workshop: "Mysore Auto Workshop",
+        contact: "+919000000002"
+      },
+      {
+        state: "Maharashtra",
+        district: "Pune",
+        center: "Center C",
+        service_center: "PQR Services",
+        workshop: "Pune Auto Workshop",
+        contact: "+917025831137"
+      }
+    ];
+  </script>
+
+  <!-- Logic for Dropdowns and Display -->
+  <script>
+    const stateSelect = document.getElementById("stateSelect");
+    const districtSelect = document.getElementById("districtSelect");
+    const centerSelect = document.getElementById("centerSelect");
+
+    function loadStates() {
+      const states = [...new Set(data.map(item => item.state))];
+      states.forEach(state => {
+        const option = document.createElement("option");
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+      });
+    }
+
+    function loadDistricts() {
+      districtSelect.innerHTML = `<option value="">Select District</option>`;
+      centerSelect.innerHTML = `<option value="">Select Center</option>`;
+      document.getElementById("details").style.display = "none";
+      const selectedState = stateSelect.value;
+      if (!selectedState) return;
+      const districts = [...new Set(data.filter(item => item.state === selectedState).map(item => item.district))];
+      districts.forEach(district => {
+        const option = document.createElement("option");
+        option.value = district;
+        option.textContent = district;
+        districtSelect.appendChild(option);
+      });
+    }
+
+    function loadCenters() {
+      centerSelect.innerHTML = `<option value="">Select Center</option>`;
+      document.getElementById("details").style.display = "none";
+      const selectedState = stateSelect.value;
+      const selectedDistrict = districtSelect.value;
+      if (!selectedState || !selectedDistrict) return;
+      const centers = data.filter(item => item.state === selectedState && item.district === selectedDistrict);
+      centers.forEach(center => {
+        const option = document.createElement("option");
+        option.value = center.center;
+        option.textContent = center.center;
+        centerSelect.appendChild(option);
+      });
+    }
+
+    function showDetails() {
+      const selectedState = stateSelect.value;
+      const selectedDistrict = districtSelect.value;
+      const selectedCenter = centerSelect.value;
+      const item = data.find(d => d.state === selectedState && d.district === selectedDistrict && d.center === selectedCenter);
+      if (item) {
+        document.getElementById("serviceCenter").textContent = item.service_center;
+        document.getElementById("workshop").textContent = item.workshop;
+        document.getElementById("contactNumber").textContent = item.contact;
+        document.getElementById("callButton").href = `tel:${item.contact}`;
+        document.getElementById("serviceButton").href = `tel:${item.contact}`;
+        document.getElementById("details").style.display = "block";
+      }
+    }
+
+    // Load states on page load
+    loadStates();
+  </script>
+
+</body>
+</html>
